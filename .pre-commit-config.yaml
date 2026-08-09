@@ -1,8 +1,37 @@
 repos:
+  - repo: https://github.com/psf/black
+    rev: 23.12.0
+    hooks:
+      - id: black
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.0
+    hooks:
+      - id: isort
+        name: isort (python)
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.8.0
     hooks:
       - id: mypy
-        args:  [--config-file=mypy.ini]
+        args: [--config-file=mypy.ini]
         additional_dependencies: []
         files: ^todo_app/
+
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        # 【关键修改点】这里加了 poetry run，去虚拟环境里找 pytest
+        entry: poetry run pytest tests/ -v
+        language: system
+        pass_filenames: false
+        always_run: true

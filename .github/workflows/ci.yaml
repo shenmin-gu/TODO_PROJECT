@@ -1,0 +1,29 @@
+# .github/workflows/ci.yml
+name: CI
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  jobs:
+    line-and-test:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+        - name: Set up Python
+          uses: actions/setup-python@v5
+          with:
+            python-version: "3.11"
+        - name: Install dependencies
+          run: |
+            python -m pip install --upgrade pip
+            pip install black isort pytest mypy
+            pip install -r requirements.txt
+        - name: Check formatting with black
+          run: black --check todo_app/ tests/
+        - name: Check imports with isort
+          run: isort --check-only todo_app/ tests/
+        - name: Type check with mypy
+          run: mypy todo_app/
+        - name: Run tests
+          run: pytest tests/
