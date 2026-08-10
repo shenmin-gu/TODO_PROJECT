@@ -20,7 +20,10 @@ class TaskStorage:
                 content = f.read().strip()
                 if not content:  # 文件为空
                     return []
-                data: list[dict[str, Any]] = json.loads(content)  # 使用 loads，或继续用 load
+                raw: Any = json.loads(content)
+                if not isinstance(raw, list):
+                    return []
+                data: list[dict[str, Any]] = raw  # 使用 loads，或继续用 load
                 return [Task.from_dict(item) for item in data]
         except json.JSONDecodeError as e:
             # 若文件内容无效，可返回空列表或抛出更明确的异常
@@ -32,7 +35,7 @@ class TaskStorage:
     def save_all(self, tasks: list[Task]) -> None:
         """将所有任务对象保存到文件"""
         try:
-            data: list[dict] = [task.to_dict() for task in tasks]
+            data: list[dict[str, Any]] = [task.to_dict() for task in tasks]
             with open(self.file_path, "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
         except (IOError, TypeError) as e:

@@ -107,9 +107,9 @@ def test_save_all_write_error(mock_open_func, storage):
     # 让 open 成功（返回 mock 文件句柄），但文件句柄的写入抛异常
     mock_handle = MagicMock()
     mock_handle.__enter__.return_value = mock_handle
+    mock_open_func.return_value = mock_handle
     # json.dump 会调用 write，我们让它抛 OSError
     mock_handle.write.side_effect = OSError("磁盘已满")
-    mock_open_func.return_value = OSError("磁盘已满")
     tasks = [Task(task_id=1, title="测试", completed=False)]
     with pytest.raises(FileWriteError):
         storage.save_all(tasks)

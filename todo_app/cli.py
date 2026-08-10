@@ -8,7 +8,7 @@ class TodoAppCLI:
     def __init__(self) -> None:
         # 依赖注入：把具体存储对象传给管理器
         storage = TaskStorage("tasks.json")
-        self.manager = TaskManager(storage)
+        self.manager: TaskManager = TaskManager(storage)
 
     def run(self) -> None:
         print("待办事项应用 v2（OOP 版）")

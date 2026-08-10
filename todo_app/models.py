@@ -16,7 +16,11 @@ class Task:
 
     def to_dict(self) -> Dict[str, Union[int, str, bool]]:
         """转为字典，方便序列化"""
-        return {"id": self.id, "title": self.title, "completed": self.completed}
+        return {
+            "id": self.id,
+            "title": self.title,
+            "completed": self.completed,
+        }
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "Task":
