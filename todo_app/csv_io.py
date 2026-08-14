@@ -87,7 +87,9 @@ def import_tasks_from_csv(file_path: str) -> List[Task]:
                     f"需要的列：{', '.join(CSV_FIELDNAMES)}"
                 )
             # 逐行解析
-            for row_num, row in enumerate(reader, start=2):  # 第1行是表头，数据从第2行开始
+            for row_num, row in enumerate(
+                reader, start=2
+            ):  # 第1行是表头，数据从第2行开始
                 try:
                     task = _parse_csv_row(row, row_num)
                     tasks.append(task)
@@ -100,7 +102,8 @@ def import_tasks_from_csv(file_path: str) -> List[Task]:
     if errors:
         error_detail = "\n  ".join(errors)
         raise ValidationError(
-            f"CSV 导入完成，但以下行解析失败:\n {error_detail}\n" f"成功导入：{len(tasks)} 条"
+            f"CSV 导入完成，但以下行解析失败:\n {error_detail}\n"
+            f"成功导入：{len(tasks)} 条"
         )
     return tasks
 
