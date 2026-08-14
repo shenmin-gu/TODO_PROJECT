@@ -7,3 +7,5 @@ venv/
 .pytest_cache/
 .mypy_cache/
 .env
+todo_app.log
+tasks_export.csv

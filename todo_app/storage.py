@@ -4,6 +4,7 @@ import os
 from typing import Any
 
 from .exceptions import FileReadError, FileWriteError
+from .logger import logger
 from .models import Task
 
 
@@ -13,6 +14,7 @@ class TaskStorage:
 
     def load_all(self) -> list[Task]:
         """从文件加载所有任务对象"""
+        logger.info("正在从 %s 加载任务...", self.file_path)
         if not os.path.exists(self.file_path):
             return []
         try:
@@ -24,6 +26,8 @@ class TaskStorage:
                 if not isinstance(raw, list):
                     return []
                 data: list[dict[str, Any]] = raw  # 使用 loads，或继续用 load
+                tasks = [Task.from_dict(item) for item in data]
+                logger.debug("加载完成，共 %d 条任务", len(tasks))
                 return [Task.from_dict(item) for item in data]
         except json.JSONDecodeError as e:
             # 若文件内容无效，可返回空列表或抛出更明确的异常
