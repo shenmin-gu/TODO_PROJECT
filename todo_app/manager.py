@@ -1,5 +1,8 @@
 # todo_app/manager.py
+import logging
+
 from .exceptions import EmptyTitleError, TaskNotFoundError
+from .logger import logger  # 或者用标准写法 logging.getLogger(__name__)
 from .models import Task
 from .storage import TaskStorage
 
@@ -17,10 +20,14 @@ class TaskManager:
     def add_task(self, title: str) -> Task:
         """添加一个新任务，标题不能为空"""
         if not title or not title.strip():
+            logger.warning("尝试添加空标题任务，已拒绝")  # 黄灯：用户操作异常
             raise EmptyTitleError()
         new_task = Task(self._get_next_id(), title.strip())
         self.tasks.append(new_task)
         self.storage.save_all(self.tasks)  # 持久化
+        logger.info(
+            "添加任务成功：id=%d", new_task.id
+        )  # 注意不要记标题全文，见安全提醒
         return new_task
 
     def complete_task(self, task_id: int) -> Task:
@@ -28,6 +35,7 @@ class TaskManager:
         task = self._find_task(task_id)
         task.mark_completed()
         self.storage.save_all(self.tasks)
+        logger.info("完成任务成功：id=%d", task_id)
         return task
 
     def delete_task(self, task_id: int) -> Task:
@@ -35,6 +43,7 @@ class TaskManager:
         task = self._find_task(task_id)
         self.tasks.remove(task)
         self.storage.save_all(self.tasks)
+        logger.info("删除任务成功：id=%d", task_id)
         return task
 
     def get_all_tasks(self) -> list[Task]:

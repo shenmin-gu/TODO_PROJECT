@@ -8,6 +8,7 @@ from .exceptions import (  # 🆕 新增
     TaskNotFoundError,
     ValidationError,
 )
+from .logger import logger
 from .manager import TaskManager
 from .storage import TaskStorage
 
@@ -19,27 +20,36 @@ class TodoAppCLI:
         self.manager: TaskManager = TaskManager(storage)
 
     def run(self) -> None:
+        logger.info("待办事项应用 v2 启动")
         print("待办事项应用 v2（OOP 版）")
-        while True:
-            self._show_menu()
-            choice = input("请选择操作：").strip()
-            if choice == "1":
-                self._show_tasks()
-            elif choice == "2":
-                self._add_task()
-            elif choice == "3":
-                self._complete_task()
-            elif choice == "4":
-                self._delete_task()
-            elif choice == "5":
-                self._export_csv()
-            elif choice == "6":
-                self._import_csv()
-            elif choice == "0":
-                print("👋 再见！")
-                break
-            else:
-                print(f"❌ 无效选择「{choice}」，请输入 0~6")
+        try:
+            while True:
+                self._show_menu()
+                choice = input("请选择操作：").strip()
+                if choice == "1":
+                    self._show_tasks()
+                elif choice == "2":
+                    self._add_task()
+                elif choice == "3":
+                    self._complete_task()
+                elif choice == "4":
+                    self._delete_task()
+                elif choice == "5":
+                    self._export_csv()
+                elif choice == "6":
+                    self._import_csv()
+                elif choice == "0":
+                    print("👋 再见！")
+                    break
+                else:
+                    logger.warning("用户输入了无效选项：%r", choice)
+        except KeyboardInterrupt:
+            print("\n 👋 再见！")
+            logger.info("用户按 Ctrl+C 退出")
+        except Exception:
+            logger.exception("应用发生未捕获异常，已退出")  # 兜底：任何崩溃都有案可查
+            print("❌ 程序发生错误，详情见 todo_app.log")
+            raise
 
     def _show_menu(self) -> None:
         print("\n===== 待办事项应用 =====")
@@ -53,12 +63,13 @@ class TodoAppCLI:
 
     def _export_csv(self) -> None:
         """将当前所有任务导出为 CSV 文件"""
-        file_path = input("请输入导出文件路径（默认：tasks_export.csv)：").strip()
+        file_path = input("请输入导出文件路径（默认：tasks_export.csv）：").strip()
         if not file_path:
             file_path = "tasks_export.csv"
         # 自动加 .csv 后缀
         if not file_path.endswith(".csv"):
             file_path += ".csv"
+        logger.info("用户请求导出 CSV 到 %s", file_path)
         try:
             tasks = self.manager.get_all_tasks()
             count = export_tasks_to_csv(tasks, file_path)

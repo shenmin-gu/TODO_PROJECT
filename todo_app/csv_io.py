@@ -69,8 +69,10 @@ def import_tasks_from_csv(file_path: str) -> List[Task]:
         FileReadError: 文件不存在或读取失败
         ValidationError: CSV 格式不正确（缺少必要列等）
     """
+    logger.info("开始从 %s 导入 CSV", file_path)
     # 检查文件是否存在
     if not os.path.exists(file_path):
+        logger.error("CSV 文件不存在：%s", file_path)
         raise FileReadError(f"文件不存在", file_path=file_path)
     tasks: List[Task] = []
     errors: List[str] = []  # 收集所有行的错误，最后一起报告
@@ -97,14 +99,17 @@ def import_tasks_from_csv(file_path: str) -> List[Task]:
                     # 单行解析失败不中断，记录错误继续
                     errors.append(f"第 {row_num} 行：{e}")
     except (IOError, OSError) as e:
+        logger.exception("读取 CSV 失败：%s", file_path)
         raise FileReadError(f"读取 CSV 失败：{e}", file_path=file_path) from e
     # 如果有行解析失败，汇总报告
     if errors:
+        logger.warning("CSV 导入有 %d 行解析失败", len(errors))
         error_detail = "\n  ".join(errors)
         raise ValidationError(
             f"CSV 导入完成，但以下行解析失败:\n {error_detail}\n"
             f"成功导入：{len(tasks)} 条"
         )
+    logger.info("CSV 导入成功，共 %d 条", len(tasks))
     return tasks
 
 

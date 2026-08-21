@@ -28,12 +28,16 @@ class TaskStorage:
                 data: list[dict[str, Any]] = raw  # 使用 loads，或继续用 load
                 tasks = [Task.from_dict(item) for item in data]
                 logger.debug("加载完成，共 %d 条任务", len(tasks))
-                return [Task.from_dict(item) for item in data]
+                return tasks
         except json.JSONDecodeError as e:
             # 若文件内容无效，可返回空列表或抛出更明确的异常
             # 这里建议返回空列表，以便应用能启动
+            logger.warning(
+                "数据文件 %s 内容损坏，无法解析，已按空列表处理", self.file_path
+            )
             return []
         except OSError as e:
+            logger.exception("加载文件 %s 失败", self.file_path)
             raise FileReadError(str(e), file_path=self.file_path) from e
 
     def save_all(self, tasks: list[Task]) -> None:
@@ -42,5 +46,7 @@ class TaskStorage:
             data: list[dict[str, Any]] = [task.to_dict() for task in tasks]
             with open(self.file_path, "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
+            logger.debug("已保存 %d 条任务到 %s", len(tasks), self.file_path)
         except (IOError, TypeError) as e:
+            logger.exception("保存任务到 %s 失败", self.file_path)  # 红灯 + 完整堆栈
             raise FileWriteError(str(e), file_path=self.file_path) from e
