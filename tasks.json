@@ -2,7 +2,7 @@
   {
     "id": 1,
     "title": "系统学习 Python",
-    "completed": false
+    "completed": true
   },
   {
     "id": 2,
@@ -13,11 +13,6 @@
     "id": 3,
     "title": "找工作、投简历",
     "completed": true
-  },
-  {
-    "id": 4,
-    "title": "系统学习 Python",
-    "completed": false
   },
   {
     "id": 5,

@@ -5,20 +5,19 @@ import logging
 import os
 import sys
 
+from .config import settings
+
 
 def setup_logger(
     name: str = "todo_app",
-    log_file: str = "todo_app.log",
-    level: int = logging.INFO,
+    log_file: str | None = None,
+    level: int | None = None,
 ) -> logging.Logger:
-    """
-    配置并返回一个 logger 实例。
-    日志同时输出到：
-      1. 控制台（INFO 及以上）
-      2. 文件（DEBUG 及以上，方便排查问题）
-    """
+    # 不传参数时，从配置中心取值
+    log_file = log_file or settings.log_file
+    level = level or settings.log_level
     logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)  # 总开关设为最低，由各 handler 控制
+    logger.setLevel(level)  # 总开关设为最低，由各 handler 控制
     # 避免重复添加 handler（热重载场景）
     if logger.handlers:
         return logger

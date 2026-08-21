@@ -1,5 +1,6 @@
 # todo_app/cli.py（在原有基础上添加两个方法和两个菜单项）
 # ===== 文件顶部添加导入 =====
+from .config import settings
 from .csv_io import export_tasks_to_csv, import_tasks_from_csv
 from .exceptions import (  # 🆕 新增
     EmptyTitleError,
@@ -16,7 +17,7 @@ from .storage import TaskStorage
 class TodoAppCLI:
     def __init__(self) -> None:
         # 依赖注入：把具体存储对象传给管理器
-        storage = TaskStorage("tasks.json")
+        storage = TaskStorage(settings.data_file)
         self.manager: TaskManager = TaskManager(storage)
 
     def run(self) -> None:
