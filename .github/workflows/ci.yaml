@@ -18,12 +18,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install poetry
-          pip install
+          poetry install --with dev
       - name: Check formatting with black
-        run: black --check todo_app/ tests/
+        run: poetry run black --check todo_app/ tests/
       - name: Check imports with isort
-        run: isort --check-only todo_app/ tests/
+        run: poetry run isort --check-only todo_app/ tests/
       - name: Type check with mypy
-        run: mypy todo_app/
+        run: poetry run mypy todo_app/
       - name: Run tests
-        run: pytest tests/
+        run: poetry run pytest tests/
